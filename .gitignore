@@ -1,3 +1,5 @@
 __pycache__
 opus_openoffice_weights/*.pt
 runs
+tokenizer_en_GB.json
+tokenizer_zh_CN.json
