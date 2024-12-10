@@ -33,11 +33,9 @@ class PositionalEncoding(nn.Module):
         # Create a vector of shape (d_model / 2)
         div_term = torch.exp(torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model))
 
-        # Apply sine to even indices
-        pe[:, 0::2] = torch.sin(position * div_term)    # sin(position * (10000 ** (2i / d_model))
-
-        # Apply cosine to odd indices
-        pe[:, 1::2] = torch.cos(position * div_term)    # cos(position * (10000 ** (2i / d_model))
+        # Question 4.1: Apply sine to even indices
+      
+        # Question 4.2: Apply cosine to odd indices
 
         # Add a batch dimension to positional encoding matrix
         pe = pe.unsqueeze(0)    # (1, seq_len, d_model)
@@ -62,7 +60,9 @@ class LayerNormalization(nn.Module):
         # Shape x: (batch, seq_len, hidden_size)
         mean = x.mean(dim = -1, keepdim=True)       # (batch, seq_len, 1)
         std = x.std(dim = -1, keepdim=True)         # (batch, seq_len, 1)
-        return self.alpha * (x - mean) / (std + self.eps) + self.bias
+        # Question 5: Calculate the Layer Normalization based on the mean and std
+
+        return Norm
 
 
 class FeedForwardBlock(nn.Module):
@@ -85,9 +85,11 @@ class MultiHeadAttentionBlock(nn.Module):
         assert d_model % h == 0, "d_model (embedding dimensions) is not divisible by h (# of heads)"
 
         self.d_k = d_model // h
-        self.w_q = nn.Linear(d_model, d_model)  # WQ
-        self.w_k = nn.Linear(d_model, d_model)  # WK
-        self.w_v = nn.Linear(d_model, d_model)  # WV
+        # Question 6: Project Input embeddings into queries (Q), keys (K), and values (V) using self.w_q, self.w_k, and self.w_v.
+      
+
+
+
         self.w_o = nn.Linear(d_model, d_model)  # WO where, h * d_v = h * d_k = d_model
         self.dropout = nn.Dropout(dropout)
 
@@ -149,9 +151,9 @@ class ResidualConnection(nn.Module):
 class EncoderBlock(nn.Module):
     def __init__(self, features: int, self_attention_block: MultiHeadAttentionBlock, feed_forward_block: FeedForwardBlock, dropout: float) -> None:
         super().__init__()
-        self.self_attention_block = self_attention_block
-        self.feed_forward_block = feed_forward_block
-        self.residual_connections = nn.ModuleList([ResidualConnection(features, dropout) for _ in range(2)])
+        # Question 7: Defines a Transformer encoder.
+       
+       
 
     def forward(self, x, src_mask):
         # Lambda is used to apply self-attention to the input x where the queries, keys, and values are all x; the result is passed to the skip connection
@@ -176,10 +178,11 @@ class Encoder(nn.Module):
 class DecoderBlock(nn.Module):
     def __init__(self, features: int, self_attention_block: MultiHeadAttentionBlock, cross_attention_block: MultiHeadAttentionBlock, feed_forward_block: FeedForwardBlock, dropout: float) -> None:
         super().__init__()
-        self.self_attention_block = self_attention_block
-        self.cross_attention_block = cross_attention_block
-        self.feed_forward_block = feed_forward_block
-        self.residual_connections = nn.ModuleList([ResidualConnection(features, dropout) for _ in range (3)])
+        # Question 8: Defines a Transformer decoder.
+
+
+
+
 
     def forward(self, x, encoder_output, src_mask, tgt_mask):
         x = self.residual_connections[0](x, lambda x: self.self_attention_block(x, x, x, tgt_mask))
@@ -213,13 +216,13 @@ class ProjectionLayer(nn.Module):
 class Transformer(nn.Module):
     def __init__(self, encoder: Encoder, decoder: Decoder, src_embed: InputEmbeddings, tgt_embed: InputEmbeddings, src_pos: PositionalEncoding, tgt_pos: PositionalEncoding, projection_layer: ProjectionLayer) -> None:
         super().__init__()
-        self.encoder = encoder
-        self.decoder = decoder
-        self.source_embed = src_embed
-        self.target_embed = tgt_embed
-        self.source_pos = src_pos
-        self.target_pos = tgt_pos
-        self.projection_layer = projection_layer
+        # [Line 219]:  Question 9: Defines a Transformer.
+
+
+
+
+
+
 
     def encode(self, src, src_mask):
         src = self.source_embed(src)
